@@ -1,5 +1,6 @@
 """Handlers for bot commands"""
 
+
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 
@@ -17,7 +18,7 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
     ctx.user_data["curr_user"] = curr_user
 
     if curr_user in usernames:
-        logger.info("Conversation started with %s", curr_user)
+        logger.info("Conversation started with '%s'", curr_user)
         await update.message.reply_text(start_text)
     else:
         logger.info("Invalid user: %s", curr_user)
@@ -38,7 +39,7 @@ async def get_item(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
     user = ctx.user_data["curr_user"]
     ctx.user_data["item"] = item
 
-    logger.info("%s added %s", user, item)
+    logger.info("'%s' added '%s'", user, item)
     await update.message.reply_text(f"How much did you buy {item} for??")
 
     return PRICE
@@ -49,7 +50,7 @@ async def get_price(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
     user = update.message.from_user.username
     price = update.message.text
     ctx.user_data["price"] = price
-    price_text = "%s added %s for ₹ %s" % (user, ctx.user_data["item"], price)
+    price_text = "'%s' added '%s' for '₹%s'" % (user, ctx.user_data["item"], price)
 
     logger.info(price_text)
     await update.message.reply_text(price_text)
