@@ -15,6 +15,7 @@ from telegram.ext import (
 from config import bot_token
 from commands import COMMANDS
 from handlers import start, get_item, get_price, help_command, PRICE, ITEM
+from db import DB
 
 
 async def post_init(app: Application):
@@ -27,6 +28,8 @@ def main() -> None:
     """Run the bot."""
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(bot_token).post_init(post_init).build()
+    db = DB()
+    db.setup()
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
