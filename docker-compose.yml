@@ -1,0 +1,9 @@
+services:
+  bot:
+    build: .
+    command: python main.py
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app/
