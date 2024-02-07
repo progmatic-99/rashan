@@ -14,7 +14,16 @@ from telegram.ext import (
 
 from config import bot_token
 from commands import COMMANDS
-from handlers import start, get_item, get_price, help_command, PRICE, ITEM
+from handlers import (
+    start,
+    get_item,
+    get_item_quantity,
+    get_price,
+    help_command,
+    PRICE,
+    QUANTITY,
+    ITEM,
+)
 from db import DB
 
 
@@ -35,6 +44,7 @@ def main() -> None:
         entry_points=[CommandHandler("start", start)],
         states={
             ITEM: [MessageHandler(filters.TEXT, get_item)],
+            QUANTITY: [MessageHandler(filters.TEXT, get_item_quantity)],
             PRICE: [MessageHandler(filters.TEXT, get_price)],
         },
         fallbacks=[CommandHandler("help", help_command)],

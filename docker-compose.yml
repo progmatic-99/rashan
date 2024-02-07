@@ -1,7 +1,7 @@
 services:
   bot:
     build: .
-    command: python main.py
+    command: python bot.py
     develop:
       watch:
         - action: sync
