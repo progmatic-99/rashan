@@ -43,11 +43,13 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            ITEM: [MessageHandler(filters.TEXT, get_item)],
-            QUANTITY: [MessageHandler(filters.TEXT, get_item_quantity)],
-            PRICE: [MessageHandler(filters.TEXT, get_price)],
+            ITEM: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_item)],
+            QUANTITY: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, get_item_quantity)
+            ],
+            PRICE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_price)],
         },
-        fallbacks=[CommandHandler("help", help_command)],
+        fallbacks=[MessageHandler(filters.TEXT, help_command)],
     )
     application.add_handler(conv_handler)
     application.add_handler(CommandHandler("help", help_command))

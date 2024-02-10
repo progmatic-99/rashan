@@ -46,7 +46,7 @@ class DB:
             c.execute(stmt, args)
             self.conn.commit()
         except sqlite3.Error as e:
-            print(e)
+            raise e
 
     def delete_item(self, item_text):
         """Delete items"""

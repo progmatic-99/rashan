@@ -1,6 +1,7 @@
 """Handlers for bot commands"""
 
 
+import sqlite3
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 
@@ -37,12 +38,13 @@ async def get_item(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def get_item_quantity(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
     """Getting the item"""
+
     quantity = update.message.text
     item = ctx.user_data["item"]
     user = ctx.user_data["curr_user"]
     ctx.user_data["quantity"] = quantity
 
-    logger.info("'%s' bought '%s' of '%s'", user, quantity, item)
+    logger.info("'%s' bought '%s' '%s'", user, quantity, item)
     await update.message.reply_text(f"How much did you buy {item} for??")
 
     return PRICE
@@ -51,15 +53,27 @@ async def get_item_quantity(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> i
 async def get_price(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
     """Gets the price of the item"""
     user = update.message.from_user.username
+
+    if not update.message.text.isdigit():
+        await update.message.reply_text("Enter valid price!!")
+        return PRICE
+
     price = update.message.text
     ctx.user_data["price"] = price
     quantity = ctx.user_data["quantity"]
     item = ctx.user_data["item"]
-    price_text = f"{user} added {quantity} of {item} for '₹{price}'"
+    price_text = f"{user} added {quantity} {item} for '₹{price}'"
 
-    logger.info(price_text)
     db = DB()
-    db.add_item(ctx.user_data)
+
+    try:
+        db.add_item(ctx.user_data)
+        logger.info(price_text)
+    except sqlite3.Error as e:
+        logger.error(e)
+        await update.message.reply_text(e)
+        return PRICE
+
     await update.message.reply_text(price_text)
 
     return ConversationHandler.END
