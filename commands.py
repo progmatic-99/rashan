@@ -5,7 +5,7 @@ MAX_COMMAND_LIMIT = 100
 
 COMMANDS = [
     ("start", "starts the bot!!"),
-    ("add", "add expense"),
+    ("add", "add all expenses together"),
     ("edit", "edit expense"),
     ("delete", "delete expense"),
     ("recents", "recent expenses"),

@@ -2,6 +2,10 @@
 import sqlite3
 import threading
 
+from typing import List, Tuple
+
+BulkItemStructure = List[Tuple[str, str, int]]
+
 
 class DB:
     """Wrapper for common DB actions"""
@@ -47,6 +51,24 @@ class DB:
             self.conn.commit()
         except sqlite3.Error as e:
             raise e
+
+        c.close()
+
+    def add_bulk_items(self, all_items: BulkItemStructure):
+        """
+        Add items in bulk
+        - all_items: List[Tuple[name, quantity, price]]
+        """
+        stmt = "INSERT INTO items (name, quantity, price) VALUES (?,?,?)"
+
+        c = self.conn.cursor()
+        try:
+            c.executemany(stmt, all_items)
+            self.conn.commit()
+        except sqlite3.Error as e:
+            raise e
+
+        c.close()
 
     def delete_item(self, item_text):
         """Delete items"""
