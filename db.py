@@ -77,7 +77,19 @@ class DB:
         self.conn.execute(stmt, args)
         self.conn.commit()
 
-    def get_items(self):
-        """Get items"""
-        stmt = "SELECT description FROM items"
-        return [x[0] for x in self.conn.execute(stmt)]
+    def recent_items(self):
+        """Get recent items"""
+        stmt = "SELECT * FROM items ORDER BY created_at DESC LIMIT 5"
+        c = self.conn.cursor()
+        items = None
+        try:
+            c.execute(stmt)
+            items = c.fetchall()
+            c.close()
+        except sqlite3.Error as e:
+            raise e
+
+        if not items:
+            return "No items exists!!"
+
+        return items

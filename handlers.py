@@ -3,6 +3,7 @@
 
 import sqlite3
 import re
+import prettytable as pt
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 
@@ -43,27 +44,24 @@ async def add(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def get_all_items(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
-    """Parse all the items
+    """
+    Parse all the items
     - item_name: str
     - quantity: text (1kg, 1, 1L)
     - price: int
     """
     user = update.message.from_user.username
     user_input = update.message.text.strip().split("\n")
-    print(user_input)
     all_items: BulkItemStructure = []
 
     for item_data in user_input:
         cleaned_data = re.sub(r"\s+", " ", item_data)
-        print(cleaned_data)
         name, quantity, price = cleaned_data.split()
-        print(name, quantity, price)
-        if not price.isdigit() and price <= 0:
+        if not price.isdigit() and int(price) <= 0:
             await update.message.reply_text(f"Enter valid price for {name}")
             return ALL_ITEMS
 
         all_items.append((name, quantity, price))
-        print(all_items)
 
     db = DB()
 
@@ -91,7 +89,7 @@ async def get_item(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def get_item_quantity(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
-    """Getting the item"""
+    """Getting the item quantity"""
 
     quantity = update.message.text
     item = ctx.user_data["item"]
@@ -109,7 +107,7 @@ async def get_price(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
     user = update.message.from_user.username
     price = update.message.text
 
-    if not price.isdigit() and price <= 0:
+    if not price.isdigit() and int(price) <= 0:
         await update.message.reply_text("Enter valid price!!")
         return PRICE
 
@@ -133,21 +131,48 @@ async def get_price(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
     return ConversationHandler.END
 
 
+async def recents(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Get the recently added 5 items"""
+    db = DB()
+    items = None
+    curr_user = update.message.from_user.username
+
+    try:
+        items = db.recent_items()
+    except sqlite3.Error as e:
+        logger.error(e)
+        await update.message.reply_text(e)
+
+    if not isinstance(items, str):
+        table = pt.PrettyTable(["Name", "Quantity", "Price", "Time"])
+        for name, quantity, price, time in items:
+            table.add_row([name, quantity, price, time])
+
+        logger.info("Recent items table sent to '%s'", curr_user)
+        await update.message.reply_text(f"```{table}```", parse_mode="MarkdownV2")
+    else:
+        logger.info("No recent items in db!!")
+        await update.message.reply_text(items)
+
+
 async def help_command(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
     """Displays info on how to use the bot."""
 
     help_text = """
-    /start -> To add a single item
-    /add -> To add multiple items
-    /help -> show you this output```
+/start -> To add a single item
+/add -> To add multiple items
+/recents -> To show recently added items
+/help -> show you this output
     """
 
-    await update.message.reply_text(help_text)
+    await update.message.reply_text(f"```{help_text}```", parse_mode="MarkdownV2")
 
 
 async def restart(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
     """Restarts the bot"""
     ctx.bot_data["restart"] = True
+    curr_user = update.message.from_user.username
 
+    logger.info("'%s' restarted the bot!!", curr_user)
     await update.message.reply_text("Restarting the bot!!")
     ctx.application.stop_running()

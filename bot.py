@@ -20,6 +20,7 @@ from commands import COMMANDS
 from handlers import (
     start,
     add,
+    recents,
     restart,
     get_all_items,
     get_item,
@@ -71,6 +72,7 @@ def main() -> None:
     application.add_handler(conv_handler)
     application.add_handler(bulk_conv_handler)
     application.add_handler(CommandHandler("restart", restart))
+    application.add_handler(CommandHandler("recents", recents))
     application.add_handler(CommandHandler("help", help_command))
 
     # Run the bot until the user presses Ctrl-C
