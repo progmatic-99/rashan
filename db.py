@@ -1,4 +1,5 @@
 """DB Helper code"""
+
 import sqlite3
 import threading
 
@@ -93,3 +94,28 @@ class DB:
             return "No items exists!!"
 
         return items
+
+    def get_monthly_item_usage(self, month: str, year: str):
+        """Gets monthly quantity used of all items"""
+        stmt = """
+        SELECT name, sum(quantity), sum(price)
+        FROM items
+        where strftime('%Y', created_at) = (?)
+        and strftime('%m', created_at) = (?)
+        GROUP BY name
+        """
+
+        c = self.conn.cursor()
+        result = None
+        args = (year, month)
+        try:
+            c.execute(stmt, args)
+            result = c.fetchall()
+            c.close()
+        except sqlite3.Error as e:
+            raise e
+
+        if not result:
+            return f"No items purchased for this {month}."
+
+        return result

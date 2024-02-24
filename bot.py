@@ -25,6 +25,7 @@ from handlers import (
     get_all_items,
     get_item,
     get_item_quantity,
+    items_usage,
     get_price,
     help_command,
     PRICE,
@@ -73,6 +74,7 @@ def main() -> None:
     application.add_handler(bulk_conv_handler)
     application.add_handler(CommandHandler("restart", restart))
     application.add_handler(CommandHandler("recents", recents))
+    application.add_handler(CommandHandler("items_usage", items_usage))
     application.add_handler(CommandHandler("help", help_command))
 
     # Run the bot until the user presses Ctrl-C

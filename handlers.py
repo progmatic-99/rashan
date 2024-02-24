@@ -1,8 +1,8 @@
 """Handlers for bot commands"""
 
-
 import sqlite3
 import re
+from datetime import datetime
 import prettytable as pt
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
@@ -146,13 +146,45 @@ async def recents(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if not isinstance(items, str):
         table = pt.PrettyTable(["Name", "Quantity", "Price", "Time"])
         for name, quantity, price, time in items:
-            table.add_row([name, quantity, price, time])
+            # sqlite3 returns a str for datetime
+            time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+            formatted_time = time.strftime("%d/%m %H:%M")
+
+            table.add_row([name, quantity, price, formatted_time])
 
         logger.info("Recent items table sent to '%s'", curr_user)
         await update.message.reply_text(f"```{table}```", parse_mode="MarkdownV2")
     else:
         logger.info("No recent items in db!!")
         await update.message.reply_text(items)
+
+
+async def items_usage(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
+    """Get the item monthly stats from data"""
+
+    # month & year needs to be in str
+    curr_month = datetime.now().strftime("%m")
+    curr_year = datetime.now().strftime("%Y")
+    curr_user = update.message.from_user.username
+
+    db = DB()
+    try:
+        result = db.get_monthly_item_usage(curr_month, curr_year)
+        logger.info(result)
+    except sqlite3.Error as e:
+        logger.error(e)
+        await update.message.reply_text(e)
+
+    if not isinstance(result, str):
+        table = pt.PrettyTable(["Name", "Total Quantity", "Total Price"])
+        for name, quantity, price in result:
+            table.add_row([name, quantity, price])
+
+        logger.info("Monthly item usage sent to %s.", curr_user)
+        await update.message.reply_text(f"```{table}```", parse_mode="MarkdownV2")
+    else:
+        logger.info("No recent result in db!!")
+        await update.message.reply_text(result)
 
 
 async def help_command(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:

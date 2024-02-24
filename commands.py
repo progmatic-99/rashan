@@ -9,5 +9,6 @@ COMMANDS = [
     ("edit", "edit expense"),
     ("delete", "delete expense"),
     ("recents", "recent expenses"),
+    ("items_usage", "Gets item usage in the current month"),
     ("help", "info about the bot!!"),
 ]
