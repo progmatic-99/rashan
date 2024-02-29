@@ -95,7 +95,7 @@ class DB:
 
         return items
 
-    def get_monthly_item_usage(self, month: str, year: str):
+    def get_monthly_usage(self, month: str, year: str):
         """Gets monthly quantity used of all items"""
         stmt = """
         SELECT name, sum(quantity), sum(price)

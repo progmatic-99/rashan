@@ -169,7 +169,7 @@ async def items_usage(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
 
     db = DB()
     try:
-        result = db.get_monthly_item_usage(curr_month, curr_year)
+        result = db.get_monthly_usage(curr_month, curr_year)
         logger.info(result)
     except sqlite3.Error as e:
         logger.error(e)
