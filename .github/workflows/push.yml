@@ -50,8 +50,8 @@ jobs:
         EC2_USER: ${{ secrets.EC2_USER }}
       run: |
         ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
-          cd /home/ec2-user/rashan
           sudo -i
+          cd /home/ec2-user/rashan
           chmod +x install.sh
           sh install.sh
         '
