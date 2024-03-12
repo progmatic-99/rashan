@@ -26,7 +26,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
           cd /home/ec2-user/rashan
-          git pull origin master
+          git reset --hard && git clean -fd && git pull origin master
         '
 
     - name: Create .env file
