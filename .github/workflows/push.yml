@@ -31,9 +31,9 @@ jobs:
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         DEPLOYMENT: ${{ secrets.DEPLOYMENT }}
-        run: |
-          echo "ACCESS_TOKEN=$ACCESS_TOKEN" > .env
-          echo "DEPLOYMENT_ENV=$DEPLOYMENT_ENV" >> .env
+      run: |
+        echo "ACCESS_TOKEN=$ACCESS_TOKEN" > .env
+        echo "DEPLOYMENT_ENV=$DEPLOYMENT_ENV" >> .env
 
     - name: Upload .env file to EC2
       env:
