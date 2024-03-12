@@ -25,7 +25,8 @@ jobs:
         EC2_USER: ${{ secrets.EC2_USER }}
       run: |
         ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
-          git clone ${{ github.event.repository.clone_url }}
+          cd /home/ec2-user/rashan
+          git pull origin master
         '
     - name: Create .env file
       env:
@@ -40,11 +41,17 @@ jobs:
         EC2_HOST: ${{ secrets.EC2_HOST }}
         EC2_USER: ${{ secrets.EC2_USER }}
       run: |
-        scp -o StrictHostKeyChecking=no .env $EC2_USER@$EC2_HOST:/rashan/.env
+        scp -o StrictHostKeyChecking=no .env $EC2_USER@$EC2_HOST:/home/ec2-user/rashan/.env
 
     - name: Run bot
+      env:
+        EC2_HOST: ${{ secrets.EC2_HOST }}
+        EC2_USER: ${{ secrets.EC2_USER }}
       run: |
-        sudo -i
-        chmod +x install.sh
-        python3 bot.py
+        ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
+          cd /home/ec2-user/rashan
+          sudo -i
+          chmod +x install.sh
+          sh install.sh
+        '
 
