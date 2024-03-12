@@ -27,3 +27,24 @@ jobs:
         ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
           git clone ${{ github.event.repository.clone_url }}
         '
+    - name: Create .env file
+      env:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        DEPLOYMENT: ${{ secrets.DEPLOYMENT }}
+        run: |
+          echo "ACCESS_TOKEN=$ACCESS_TOKEN" > .env
+        echo "DEPLOYMENT_ENV=$DEPLOYMENT_ENV" >> .env
+
+    - name: Upload .env file to EC2
+      env:
+        EC2_HOST: ${{ secrets.EC2_HOST }}
+        EC2_USER: ${{ secrets.EC2_USER }}
+      run: |
+        scp -o StrictHostKeyChecking=no .env $EC2_USER@$EC2_HOST:/rashan/.env
+
+    - name: Run bot
+      run: |
+        sudo -i
+        chmod +x install.sh
+        python3 bot.py
+
