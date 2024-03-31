@@ -71,7 +71,8 @@ async def get_all_items(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
 
         table = pt.PrettyTable(["Name", "Quantity", "Price"])
         for item in all_items:
-            table.add_row([item.name, item.quantity, item.price])
+            name, quantity, price = item
+            table.add_row([name, quantity, price])
 
         await update.message.reply_text(f"Following items were added by {user}:\n```{table}```", parsemode=MarkdownV2)
     except sqlite3.Error as e:
