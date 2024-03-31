@@ -15,6 +15,7 @@ from telegram.ext import (
     filters,
 )
 
+from logger import logger
 from config import bot_token
 from commands import COMMANDS
 from handlers import (
@@ -81,6 +82,7 @@ def main() -> None:
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
     if application.bot_data["restart"]:
+        logger.info("Restarting the bot!!!")
         os.execl(sys.executable, sys.executable, *sys.argv)
 
 
