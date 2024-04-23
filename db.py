@@ -4,7 +4,7 @@ import sqlite3
 import threading
 
 from typing import List, Tuple
-from config import db_path
+from config import DB_PATH
 
 BulkItemStructure = List[Tuple[str, str, int]]
 
@@ -17,7 +17,7 @@ class DB:
 
     def __init__(self, dbname="rashan.sqlite"):
         self.dbname = dbname
-        self.conn = sqlite3.connect(database=db_path)
+        self.conn = sqlite3.connect(database=DB_PATH)
 
     def __new__(cls, *args, **kwargs):
         with cls._lock:
