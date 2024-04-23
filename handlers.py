@@ -2,6 +2,7 @@
 
 import sqlite3
 import re
+from pytz import timezone
 from datetime import datetime
 import prettytable as pt
 from telegram import Update
@@ -161,7 +162,11 @@ async def recents(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         for name, quantity, price, time in items:
             # sqlite3 returns a str for datetime
             time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-            formatted_time = time.strftime("%d/%m %H:%M")
+            formatted_time = (
+                time.replace(tzinfo=timezone("UTC"))
+                .astimezone(timezone("Asia/Kolkata"))
+                .strftime("%d/%m %H:%M")
+            )
 
             table.add_row([name, quantity, price, formatted_time])
 
