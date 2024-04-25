@@ -1,14 +1,14 @@
 """Handlers for bot commands"""
 
 import sqlite3
-import re
-from pytz import timezone
 from datetime import datetime
+from pytz import timezone
 import prettytable as pt
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 
 from db import DB, BulkItemStructure
+from utils import parse_item_info
 from logger import logger
 
 
@@ -226,26 +226,3 @@ async def restart(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
     logger.info("'%s' restarted the bot!!", curr_user)
     await update.message.reply_text("Restarting the bot!!")
     ctx.application.stop_running()
-
-
-def parse_item_info(user_input):
-    """
-    Parses user input in the format "item_name quantity price" and returns a dictionary.
-    Args:
-        user_input: A string containing item information separated by spaces.
-    Returns:
-        A dictionary with keys "item_name", "quantity", and "price" or None if parsing fails.
-    """
-    pattern = (
-        r"(?P<item_name>\w+)\s+(?P<quantity>[0-9.]+(?:[a-zA-Z]+)?)\s+(?P<price>[0-9.]+)"
-    )
-    matches = re.match(pattern, user_input)
-
-    if matches:
-        return {
-            "item_name": matches.group("item_name"),
-            "quantity": matches.group("quantity"),
-            "price": matches.group("price"),
-        }
-
-    return None
