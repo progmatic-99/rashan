@@ -3,7 +3,9 @@ Common utils
 """
 
 import re
+from datetime import datetime
 
+from pytz import timezone
 
 PATTERN = r"(?P<item_name>\w+(?: \w+)*) (?P<quantity>\d+(?:\.\d+)?(?:\s?(?:kg|lb|oz|g|ml|L|...))?) (?P<price>\d+(?:\.\d+)?)"
 regex = re.compile(PATTERN, flags=re.IGNORECASE)
@@ -27,3 +29,17 @@ def parse_item_info(user_input):
         }
 
     return None
+
+
+def format_time(time):
+    """
+    Convert time to UTC and then to IST
+    """
+    time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+    formatted_time = (
+        time.replace(tzinfo=timezone("UTC"))
+        .astimezone(timezone("Asia/Kolkata"))
+        .strftime("%d/%m %H:%M")
+    )
+
+    return formatted_time

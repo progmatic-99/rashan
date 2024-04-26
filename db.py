@@ -96,6 +96,26 @@ class DB:
 
         return items
 
+    def search_item(self, item_name):
+        """Return last entry of an item"""
+        stmt = (
+            "SELECT * FROM items WHERE name LIKE (?) ORDER BY created_at DESC LIMIT 1"
+        )
+        c = self.conn.cursor()
+        args = (item_name,)
+        item_data = None
+        try:
+            c.execute(stmt, args)
+            item_data = c.fetchall()
+            c.close()
+        except sqlite3.Error as e:
+            raise e
+
+        if not item_data:
+            return "No item with this name exists!!"
+
+        return item_data
+
     def get_monthly_usage(self, month: str, year: str):
         """Gets monthly quantity used of all items"""
         stmt = """

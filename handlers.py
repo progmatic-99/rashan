@@ -2,13 +2,12 @@
 
 import sqlite3
 from datetime import datetime
-from pytz import timezone
 import prettytable as pt
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 
 from db import DB, BulkItemStructure
-from utils import parse_item_info
+from utils import parse_item_info, format_time
 from logger import logger
 
 
@@ -161,14 +160,9 @@ async def recents(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         table = pt.PrettyTable(["Name", "Quantity", "Price", "Time"])
         for name, quantity, price, time in items:
             # sqlite3 returns a str for datetime
-            time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-            formatted_time = (
-                time.replace(tzinfo=timezone("UTC"))
-                .astimezone(timezone("Asia/Kolkata"))
-                .strftime("%d/%m %H:%M")
-            )
+            time = format_time(time)
 
-            table.add_row([name, quantity, price, formatted_time])
+            table.add_row([name, quantity, price, time])
 
         logger.info("Recent items table sent to '%s'", curr_user)
         await update.message.reply_text(f"```{table}```", parse_mode="MarkdownV2")
@@ -226,3 +220,45 @@ async def restart(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
     logger.info("'%s' restarted the bot!!", curr_user)
     await update.message.reply_text("Restarting the bot!!")
     ctx.application.stop_running()
+
+
+async def search(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
+    """Searches the item & returns the latest entry"""
+    text = "Provide item name.."
+    curr_user = update.message.from_user.username
+    ctx.user_data["curr_user"] = curr_user
+
+    logger.info("Search started with '%s'", curr_user)
+    await update.message.reply_text(helper_text)
+
+    return ALL_ITEMS
+
+
+async def last_purchased_item(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
+    """Gets the last purchased date of item"""
+    item = update.message.text.strip()
+    curr_user = update.message.from_user.username
+
+    if item:
+        db = DB()
+        try:
+            result = db.search_item(item)
+            logger.info(result)
+        except sqlite3.Error as e:
+            logger.error(e)
+            await update.message.reply_text(e)
+
+        if not isinstance(result, str):
+            table = pt.PrettyTable(["Name", "Quantity", "Price", "Time"])
+            for name, quantity, price, time in result:
+                time = format_time(time)
+                table.add_row([name, quantity, price, time])
+
+            logger.info("Item last purchased info sent to %s.", curr_user)
+            await update.message.reply_text(f"```{table}```", parse_mode="MarkdownV2")
+        else:
+            logger.info("No recent result in db!!")
+            await update.message.reply_text(result)
+    else:
+        await update.message.reply_text("Enter valid item!!")
+        return ConversationHandler.END
