@@ -21,17 +21,20 @@ from commands import COMMANDS
 from handlers import (
     start,
     add,
+    search,
     recents,
     restart,
     get_all_items,
     get_item,
     get_item_quantity,
+    last_purchased_item,
     items_usage,
     get_price,
     help_command,
     PRICE,
     QUANTITY,
     ALL_ITEMS,
+    SEARCH,
     ITEM,
 )
 from db import DB
@@ -70,9 +73,19 @@ def main() -> None:
         },
         fallbacks=[MessageHandler(filters.TEXT, help_command)],
     )
+    search_handler = ConversationHandler(
+        entry_points=[CommandHandler("search", search)],
+        states={
+            SEARCH: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, last_purchased_item)
+            ],
+        },
+        fallbacks=[MessageHandler(filters.TEXT, help_command)],
+    )
 
     application.add_handler(conv_handler)
     application.add_handler(bulk_conv_handler)
+    application.add_handler(search_handler)
     application.add_handler(CommandHandler("restart", restart))
     application.add_handler(CommandHandler("recents", recents))
     application.add_handler(CommandHandler("items_usage", items_usage))
