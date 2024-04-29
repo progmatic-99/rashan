@@ -73,12 +73,14 @@ async def get_all_items(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
         logger.info("'%s' added multiple items.", user)
 
         table = pt.PrettyTable(["Name", "Quantity", "Price"])
+        total_price = 0
         for item in all_items:
             name, quantity, price = item
+            total_price += price
             table.add_row([name, quantity, price])
 
         await update.message.reply_text(
-            f"Following items were added by {user}:\n```{table}```",
+            f"Following items were added by {user}:\n```{table}```\nTotal Price: {total_price}",
             parse_mode="MarkdownV2",
         )
     except sqlite3.Error as e:
