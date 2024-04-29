@@ -34,6 +34,7 @@ from handlers import (
     PRICE,
     QUANTITY,
     ALL_ITEMS,
+    SEARCH,
     ITEM,
 )
 from db import DB
@@ -75,7 +76,7 @@ def main() -> None:
     search_handler = ConversationHandler(
         entry_points=[CommandHandler("search", search)],
         states={
-            ALL_ITEMS: [
+            SEARCH: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, last_purchased_item)
             ],
         },

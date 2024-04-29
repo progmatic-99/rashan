@@ -11,7 +11,7 @@ from utils import parse_item_info, format_time
 from logger import logger
 
 
-ITEM, ALL_ITEMS, QUANTITY, PRICE = range(4)
+ITEM, ALL_ITEMS, QUANTITY, PRICE, SEARCH = range(5)
 
 
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
@@ -203,10 +203,12 @@ async def help_command(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
     """Displays info on how to use the bot."""
 
     help_text = """
-/start -> To add a single item
-/add -> To add multiple items
-/recents -> To show recently added items
-/help -> show you this output
+/start: To add a single item
+/add: To add multiple items
+/recents: To show recently added items
+/search: To show last purchased info of an item
+/items_usage: Gets all items usage in the current month
+/help : show you this output
     """
 
     await update.message.reply_text(f"```{help_text}```", parse_mode="MarkdownV2")
@@ -229,9 +231,9 @@ async def search(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
     ctx.user_data["curr_user"] = curr_user
 
     logger.info("Search started with '%s'", curr_user)
-    await update.message.reply_text(helper_text)
+    await update.message.reply_text(text)
 
-    return ALL_ITEMS
+    return SEARCH
 
 
 async def last_purchased_item(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
@@ -259,6 +261,8 @@ async def last_purchased_item(update: Update, ctx: ContextTypes.DEFAULT_TYPE) ->
         else:
             logger.info("No recent result in db!!")
             await update.message.reply_text(result)
+
+        return ConversationHandler.END
     else:
         await update.message.reply_text("Enter valid item!!")
-        return ConversationHandler.END
+        return SEARCH

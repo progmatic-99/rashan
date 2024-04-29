@@ -98,14 +98,12 @@ class DB:
 
     def search_item(self, item_name):
         """Return last entry of an item"""
-        stmt = (
-            "SELECT * FROM items WHERE name LIKE (?) ORDER BY created_at DESC LIMIT 1"
-        )
+        stmt = f"SELECT * FROM items WHERE name LIKE '%{item_name}%' ORDER BY created_at DESC LIMIT 1"
+
         c = self.conn.cursor()
-        args = (item_name,)
         item_data = None
         try:
-            c.execute(stmt, args)
+            c.execute(stmt)
             item_data = c.fetchall()
             c.close()
         except sqlite3.Error as e:
