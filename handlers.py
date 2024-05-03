@@ -76,7 +76,7 @@ async def get_all_items(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
         total_price = 0
         for item in all_items:
             name, quantity, price = item
-            total_price += price
+            total_price += int(price)
             table.add_row([name, quantity, price])
 
         await update.message.reply_text(
