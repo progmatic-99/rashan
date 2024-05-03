@@ -76,7 +76,7 @@ async def get_all_items(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> int:
         total_price = 0
         for item in all_items:
             name, quantity, price = item
-            total_price += price
+            total_price += int(price)
             table.add_row([name, quantity, price])
 
         await update.message.reply_text(
@@ -184,7 +184,6 @@ async def items_usage(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
     db = DB()
     try:
         result = db.get_monthly_usage(curr_month, curr_year)
-        logger.info(result)
     except sqlite3.Error as e:
         logger.error(e)
         await update.message.reply_text(e)
@@ -247,7 +246,6 @@ async def last_purchased_item(update: Update, ctx: ContextTypes.DEFAULT_TYPE) ->
         db = DB()
         try:
             result = db.search_item(item)
-            logger.info(result)
         except sqlite3.Error as e:
             logger.error(e)
             await update.message.reply_text(e)

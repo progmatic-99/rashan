@@ -1,9 +1,5 @@
 # 🛒 Rashan Bot 🤖
 
-## > Sorry, if this is a fast video as github won't let me upload longer videos.
-
-https://github.com/progmatic-99/rashan/blob/master/rashan-fast-demo.mp4
-
 
 > Rashan Bot is a Telegram bot designed to help you manage your expenses and track item usage conveniently within the Telegram app. With Rashan Bot, you can easily add, edit, delete expenses, view recent expenses, and track item usage in the current month.
 
